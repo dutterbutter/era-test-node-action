@@ -50,4 +50,4 @@ cmd="era_test_node $MODE"
 [ "$RESOLVE_HASHES" == "true" ] && cmd="$cmd --resolve-hashes"
 
 # Execute the command
-eval "$cmd"
+eval "$cmd &"
