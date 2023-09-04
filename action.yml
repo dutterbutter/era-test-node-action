@@ -1,0 +1,25 @@
+name: 'Era Test Node Action'
+description: 'Run era_test_node with various options'
+author: 'Dustin Brickwood'
+inputs:
+  mode:
+    description: 'Mode to run era_test_node in (run, fork)'
+    required: true
+    default: 'run'
+  network:
+    description: 'Network to use (e.g., mainnet, testnet)'
+    required: false
+  forkAtHeight:
+    description: 'Block height to fork at'
+    required: false
+  showCalls:
+    description: 'User type to show calls for'
+    required: false
+    default: 'false'
+  resolveHashes:
+    description: 'Enable hash resolution'
+    required: false
+    default: 'false'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
