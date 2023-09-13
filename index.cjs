@@ -42,12 +42,30 @@ async function run() {
       args.push('--resolve-hashes');
     }
 
+    console.log('About to start era_test_node with args:', args);
+
     const child = spawn(`${toolPath}/era_test_node`, args, {
       detached: true,
       stdio: 'ignore'
     });
     
+    child.on('error', (error) => {
+      console.error(`Failed to start child process: ${error}`);
+    });
+
+    child.on('exit', (code, signal) => {
+      if (code) {
+        console.log(`Child process exited with code ${code}`);
+      } else if (signal) {
+        console.log(`Child process killed with signal ${signal}`);
+      } else {
+        console.log('Child process exited');
+      }
+    });
+
     child.unref();
+
+    console.log('era_test_node should now be running in the background');
 
   } catch (error) {
     setFailed(error.message);
