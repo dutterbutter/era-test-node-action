@@ -29,7 +29,7 @@ async function run() {
       args.push('--resolve-hashes');
     }
 
-    await exec(`./era_test_node ${args.join(' ')} &`);
+    await _exec(`./era_test_node ${args.join(' ')} &`);
 
   } catch (error) {
     setFailed(error.message);
