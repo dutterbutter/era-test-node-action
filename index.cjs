@@ -1,5 +1,11 @@
-const { getInput, setFailed } = require('@actions/core');
+const { getInput, setFailed, addPath } = require('@actions/core');
 const { exec } = require('@actions/exec');
+const tc = require('@actions/tool-cache');
+const { spawn } = require('child_process');
+
+const ERA_TEST_NODE_VERSION = 'v0.1.0-alpha.2';
+const ERA_TEST_NODE_ARCH = 'x86_64-unknown-linux-gnu';
+const ERA_TEST_NODE_NAME = 'era_test_node';
 
 async function run() {
   try {
@@ -9,11 +15,18 @@ async function run() {
     const showCalls = getInput('showCalls');
     const resolveHashes = getInput('resolveHashes');
     
-    const downloadUrl = "https://github.com/matter-labs/era-test-node/releases/download/v0.1.0-alpha.2/era_test_node-v0.1.0-alpha.2-x86_64-unknown-linux-gnu.tar.gz";
-    const tarFile = "era_test_node-v0.1.0-alpha.2-x86_64-unknown-linux-gnu.tar.gz";
-    await exec('wget', [downloadUrl]);
-    await exec('tar', ['-xzf', tarFile]);
-    await exec('chmod', ['+x', 'era_test_node']);
+    let toolPath = tc.find(ERA_TEST_NODE_NAME, ERA_TEST_NODE_VERSION);
+    
+    if (!toolPath) {
+      const downloadUrl = `https://github.com/matter-labs/era-test-node/releases/download/${ERA_TEST_NODE_VERSION}/${ERA_TEST_NODE_NAME}-${ERA_TEST_NODE_VERSION}-${ERA_TEST_NODE_ARCH}.tar.gz`;
+      const tarFile = await tc.downloadTool(downloadUrl);
+      const extractedDir = await tc.extractTar(tarFile);
+      toolPath = await tc.cacheDir(extractedDir, ERA_TEST_NODE_NAME, ERA_TEST_NODE_VERSION);
+    }
+
+    addPath(toolPath);
+
+    await exec('chmod', ['+x', `${toolPath}/era_test_node`]);
 
     let args = [mode];
     if (mode === 'fork') {
@@ -29,8 +42,12 @@ async function run() {
       args.push('--resolve-hashes');
     }
 
-    await exec('chmod', ['+x', 'start-era-test-node.sh']);
-    await exec('./start-era-test-node.sh', args);
+    const child = spawn(`${toolPath}/era_test_node`, args, {
+      detached: true,
+      stdio: 'ignore'
+    });
+    
+    child.unref();
 
   } catch (error) {
     setFailed(error.message);
