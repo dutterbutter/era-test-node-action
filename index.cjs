@@ -1,5 +1,5 @@
-import { getInput, setFailed } from '@actions/core';
-import { exec as _exec } from '@actions/exec';
+const { getInput, setFailed } = require('@actions/core');
+const { exec: _exec } = require('@actions/exec');
 
 async function run() {
   try {
