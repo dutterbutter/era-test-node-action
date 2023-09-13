@@ -29,11 +29,7 @@ async function run() {
       args.push('--resolve-hashes');
     }
 
-    // Start era_test_node in the background
-    _exec('./era_test_node', args, {
-      detached: true, 
-      stdio: 'ignore'
-    }).unref();
+    await exec(`./era_test_node ${args.join(' ')} &`);
 
   } catch (error) {
     setFailed(error.message);
