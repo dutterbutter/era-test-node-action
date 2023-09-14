@@ -4,26 +4,54 @@ author: 'Dustin Brickwood'
 inputs:
   mode:
     description: 'Mode to run era_test_node in (run, fork)'
-    required: true
+    required: false
     default: 'run'
   network:
     description: 'Network to use (e.g., mainnet, testnet)'
     required: false
   forkAtHeight:
-    description: 'Block height to fork at'
+      description: 'Block height to fork at'
+      required: false
+  port:
+    description: 'Port to listen on'
     required: false
+    default: '8011'
   showCalls:
-    description: 'User type to show calls for'
+    description: 'Show call debug information'
     required: false
-    default: 'false'
+    default: 'none'
+  showStorageLogs:
+    description: 'Show storage log information'
+    required: false
+    default: 'none'
+  showVmDetails:
+    description: 'Show VM details information'
+    required: false
+    default: 'none'
+  showGasDetails:
+    description: 'Show Gas details information'
+    required: false
+    default: 'none'
   resolveHashes:
     description: 'Enable hash resolution'
     required: false
     default: 'false'
-  saveLogs:
-    description: 'Enable saving of logs for debugging'
+  log:
+    description: 'Log filter level'
     required: false
-    default: 'false'
+    default: 'info'
+  logFilePath:
+    description: 'Log file path'
+    required: false
+    default: 'era_test_node.log'
+  target:
+    description: 'Target architecture'
+    required: false
+    default: 'x86_64-unknown-linux-gnu'
+  version:
+    description: 'Version of era_test_node'
+    required: false
+    default: 'v0.1.0-alpha.3'
 runs:
   using: 'node20'
   main: 'dist/index.cjs'

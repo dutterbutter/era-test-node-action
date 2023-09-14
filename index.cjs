@@ -3,8 +3,8 @@ const { exec } = require('@actions/exec');
 const tc = require('@actions/tool-cache');
 const { spawn } = require('child_process');
 
-const ERA_TEST_NODE_VERSION = 'v0.1.0-alpha.2';
-const ERA_TEST_NODE_ARCH = 'x86_64-unknown-linux-gnu';
+let ERA_TEST_NODE_VERSION = getInput('version') || 'v0.1.0-alpha.3';
+let ERA_TEST_NODE_ARCH = getInput('target') || 'x86_64-unknown-linux-gnu';
 const ERA_TEST_NODE_NAME = 'era_test_node';
 
 async function run() {
@@ -12,8 +12,14 @@ async function run() {
     const mode = getInput('mode');
     const network = getInput('network');
     const forkAtHeight = getInput('forkAtHeight');
+    const port = getInput('port');
     const showCalls = getInput('showCalls');
+    const showStorageLogs = getInput('showStorageLogs');
+    const showVmDetails = getInput('showVmDetails');
+    const showGasDetails = getInput('showGasDetails');
     const resolveHashes = getInput('resolveHashes');
+    const log = getInput('log');
+    const logFilePath = getInput('logFilePath');
     
     let toolPath = tc.find(ERA_TEST_NODE_NAME, ERA_TEST_NODE_VERSION);
     
@@ -28,20 +34,41 @@ async function run() {
 
     await exec('chmod', ['+x', `${toolPath}/era_test_node`]);
 
-    let args = [mode];
+    let args = [];
+    if (!mode) {
+      args.push('run');
+    }
     if (mode === 'fork') {
       args.push(network);
       if (forkAtHeight) {
         args.push('--fork-at', forkAtHeight);
       }
     }
-    if (showCalls === 'true') {
-      args.push('--show-calls=user');
+    if (port) {
+      args.push('--port', port);
+    }
+    if (showCalls) {
+      args.push('--show-calls', showCalls);
+    }
+    if (showStorageLogs) {
+      args.push('--show-storage-logs', showStorageLogs);
+    }
+    if (showVmDetails) {
+      args.push('--show-vm-details', showVmDetails);
+    }
+    if (showGasDetails) {
+      args.push('--show-gas-details', showGasDetails);
     }
     if (resolveHashes === 'true') {
       args.push('--resolve-hashes');
     }
-
+    if (log) {
+      args.push('--log', log);
+    }
+    if (logFilePath) {
+      args.push('--log-file-path', logFilePath);
+    }
+    
     console.log('About to start era_test_node with args:', args);
 
     const child = spawn(`${toolPath}/era_test_node`, args, {
