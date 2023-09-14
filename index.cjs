@@ -1,7 +1,8 @@
 const { getInput, setFailed, addPath } = require('@actions/core');
 const { exec } = require('@actions/exec');
-const tc = require('@actions/tool-cache');
 const { spawn } = require('child_process');
+const tc = require('@actions/tool-cache');
+const fs = require('fs');
 
 const ERA_TEST_NODE_VERSION = 'v0.1.0-alpha.2';
 const ERA_TEST_NODE_ARCH = 'x86_64-unknown-linux-gnu';
