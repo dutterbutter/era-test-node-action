@@ -1,6 +1,5 @@
 const { getInput, setFailed, addPath } = require('@actions/core');
 const { exec } = require('@actions/exec');
-const { spawn } = require('child_process');
 const tc = require('@actions/tool-cache');
 const fs = require('fs');
 
@@ -15,7 +14,7 @@ async function run() {
     const forkAtHeight = getInput('forkAtHeight');
     const showCalls = getInput('showCalls');
     const resolveHashes = getInput('resolveHashes');
-    const saveLogs = getInput('saveLogs');
+    const saveLogs = getInput('saveLogs') === 'true';
     
     let toolPath = tc.find(ERA_TEST_NODE_NAME, ERA_TEST_NODE_VERSION);
     
@@ -44,32 +43,20 @@ async function run() {
       args.push('--resolve-hashes');
     }
 
-    const child = spawn(`${toolPath}/era_test_node`, args, {
-      detached: true,
-      stdio: ['ignore', 'pipe', 'pipe'] 
-    });
-    if (saveLogs === 'true') {
-      const stdoutLogStream = fs.createWriteStream('stdout.log');
-      const stderrLogStream = fs.createWriteStream('stderr.log');
-      child.stdout.pipe(stdoutLogStream);
-      child.stderr.pipe(stderrLogStream);
-    }
-    
-    child.on('error', (error) => {
-      console.error(`Failed to start child process: ${error}`);
-    });
-
-    child.on('exit', (code, signal) => {
-      if (code) {
-        console.log(`Child process exited with code ${code}`);
-      } else if (signal) {
-        console.log(`Child process killed with signal ${signal}`);
-      } else {
-        console.log('Child process exited');
+    await exec(`${toolPath}/era_test_node`, args, {
+      listeners: {
+        stdout: (data) => {
+          if (saveLogs) {
+            fs.appendFileSync('stdout.log', data);
+          }
+        },
+        stderr: (data) => {
+          if (saveLogs) {
+            fs.appendFileSync('stderr.log', data);
+          }
+        },
       }
     });
-
-    child.unref();
 
     console.log('era_test_node should now be running in the background');
 
