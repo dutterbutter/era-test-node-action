@@ -1,6 +1,7 @@
 const { getInput, setFailed, addPath } = require('@actions/core');
 const { exec } = require('@actions/exec');
 const tc = require('@actions/tool-cache');
+const { spawn } = require('child_process');
 
 const ERA_TEST_NODE_VERSION = 'v0.1.0-alpha.2';
 const ERA_TEST_NODE_ARCH = 'x86_64-unknown-linux-gnu';
@@ -41,10 +42,30 @@ async function run() {
       args.push('--resolve-hashes');
     }
 
-    const command = `${toolPath}/era_test_node ${args.join(' ')} &`;
-    await exec(command);
+    console.log('About to start era_test_node with args:', args);
 
-    console.log('era_test_node should now be running in the background');
+    const child = spawn(`${toolPath}/era_test_node`, args, {
+      detached: true,
+      stdio: 'ignore'
+    });
+    
+    child.on('error', (error) => {
+      console.error(`Failed to start child process: ${error}`);
+    });
+
+    child.on('exit', (code, signal) => {
+      if (code) {
+        console.log(`Child process exited with code ${code}`);
+      } else if (signal) {
+        console.log(`Child process killed with signal ${signal}`);
+      } else {
+        console.log('Child process exited');
+      }
+    });
+
+    child.unref();
+
+    console.log('era_test_node is now be running in the background');
 
   } catch (error) {
     setFailed(error.message);
