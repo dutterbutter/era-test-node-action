@@ -1,7 +1,6 @@
 const { getInput, setFailed, addPath } = require('@actions/core');
 const { exec } = require('@actions/exec');
 const tc = require('@actions/tool-cache');
-const fs = require('fs');
 
 const ERA_TEST_NODE_VERSION = 'v0.1.0-alpha.2';
 const ERA_TEST_NODE_ARCH = 'x86_64-unknown-linux-gnu';
@@ -14,7 +13,6 @@ async function run() {
     const forkAtHeight = getInput('forkAtHeight');
     const showCalls = getInput('showCalls');
     const resolveHashes = getInput('resolveHashes');
-    const saveLogs = getInput('saveLogs') === 'true';
     
     let toolPath = tc.find(ERA_TEST_NODE_NAME, ERA_TEST_NODE_VERSION);
     
@@ -43,20 +41,8 @@ async function run() {
       args.push('--resolve-hashes');
     }
 
-    await exec(`${toolPath}/era_test_node`, args, {
-      listeners: {
-        stdout: (data) => {
-          if (saveLogs) {
-            fs.appendFileSync('stdout.log', data);
-          }
-        },
-        stderr: (data) => {
-          if (saveLogs) {
-            fs.appendFileSync('stderr.log', data);
-          }
-        },
-      }
-    });
+    const command = `${toolPath}/era_test_node ${args.join(' ')} &`;
+    await exec(command);
 
     console.log('era_test_node should now be running in the background');
 
