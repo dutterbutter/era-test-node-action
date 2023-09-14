@@ -30,13 +30,13 @@ Mode to run era_test_node in (`run`, `fork`).
 
 ### `network`
 
-The network to use (e.g., `mainnet`, `testnet`).
+The network to use (e.g., `mainnet`, `testnet`) and **should only be used** alongside `fork`.
 
 - **Required**: No
 
 ### `forkAtHeight`
 
-The block height to fork at.
+The block height to fork at. Needs to be used alongside `fork`.
 
 - **Required**: No
 
@@ -53,6 +53,7 @@ Show call debug information.
 
 - **Required**: No
 - **Default**: `none`
+- **Options**: `none`, `user`, `system`, `all`
 
 ### `showStorageLogs`
 
@@ -60,6 +61,7 @@ Show storage log information.
 
 - **Required**: No
 - **Default**: `none`
+- **Options**: `none`, `read`, `write`, `all`
 
 ### `showVmDetails`
 
@@ -67,6 +69,7 @@ Show VM details information.
 
 - **Required**: No
 - **Default**: `none`
+- **Options**: `none`, `all`
 
 ### `showGasDetails`
 
@@ -74,6 +77,7 @@ Show Gas details information.
 
 - **Required**: No
 - **Default**: `none`
+- **Options**: `none`, `all`
 
 ### `resolveHashes`
 
@@ -88,6 +92,7 @@ Log filter level.
 
 - **Required**: No
 - **Default**: `info`
+- **Options**:  `debug`, `info`, `warn`, `error`
 
 ### `logFilePath`
 
@@ -98,10 +103,11 @@ Log file path.
 
 ### `target`
 
-Target architecture (e.g., `x86_64-unknown-linux-gnu`, `x86_64-apple-darwin`, `aarch64-apple-darwin`).
+Target architecture.
 
 - **Required**: No
 - **Default**: `x86_64-unknown-linux-gnu`
+- **Options**: `x86_64-unknown-linux-gnu`, `x86_64-apple-darwin`, `aarch64-apple-darwin`
 
 ### `version`
 
@@ -111,6 +117,29 @@ Version of `era_test_node` to use.
 - **Default**: `v0.1.0-alpha.3`
 
 ## Example Usage 📝
+
+### Quickstart
+
+```yml
+name: Run Era Test Node Action
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Run Era Test Node
+      uses: dutterbutter/era-test-node-action@latest
+```
+
+### Command options
 
 ```yml
 name: Run Era Test Node Action
@@ -148,21 +177,27 @@ jobs:
 name: Run Era Test Node Action
 
 on:
-  push:
-    branches: [ main ]
-
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    name: unit-tests
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
 
     steps:
-    - name: Checkout code
+    - name: Checkout Code
       uses: actions/checkout@v3
-
+    
     - name: Run Era Test Node
       uses: dutterbutter/era-test-node-action@latest
       with:
-        mode: 'run'
+        mode: 'fork'
+        network: 'mainnet'
+        forkAtHeight: '1855248'
         showCalls: 'user'
         showStorageLogs: 'read'
         showVmDetails: 'all'
@@ -172,6 +207,13 @@ jobs:
         logFilePath: 'era_test_node.log'
         target: 'x86_64-unknown-linux-gnu'
         version: 'v0.1.0-alpha.3'
+
+    - name: Install Dependencies
+      run: yarn install
+    
+    - name: Run Tests
+      run: |
+        yarn test:contracts
 
     - name: Upload era_test_node log
       uses: actions/upload-artifact@v3
