@@ -9,7 +9,7 @@ const ERA_TEST_NODE_NAME = 'era_test_node';
 
 async function run() {
   try {
-    const mode = getInput('mode');
+    const mode = getInput('mode') || 'run';
     const network = getInput('network');
     const forkAtHeight = getInput('forkAtHeight');
     const port = getInput('port');
@@ -35,15 +35,7 @@ async function run() {
     await exec('chmod', ['+x', `${toolPath}/era_test_node`]);
 
     let args = [];
-    if (!mode) {
-      args.push('run');
-    }
-    if (mode === 'fork') {
-      args.push(network);
-      if (forkAtHeight) {
-        args.push('--fork-at', forkAtHeight);
-      }
-    }
+
     if (port) {
       args.push('--port', port);
     }
@@ -67,6 +59,17 @@ async function run() {
     }
     if (logFilePath) {
       args.push('--log-file-path', logFilePath);
+    }
+    if (mode === 'fork') {
+      args.push('fork');
+      if (network) {
+        args.push(network);
+      }
+      if (forkAtHeight) {
+        args.push('--fork-at', forkAtHeight);
+      }
+    } else {
+      args.push('run');
     }
     
     console.log('About to start era_test_node with args:', args);
