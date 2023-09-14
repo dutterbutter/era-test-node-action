@@ -20,6 +20,10 @@ inputs:
     description: 'Enable hash resolution'
     required: false
     default: 'false'
+  saveLogs:
+    description: 'Enable saving of logs for debugging'
+    required: false
+    default: 'false'
 runs:
   using: 'node20'
   main: 'dist/index.cjs'
