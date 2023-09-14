@@ -1,5 +1,5 @@
 name: 'Era Test Node Action'
-description: 'Run era_test_node with various options'
+description: 'GitHub Action that simplifies running `era_test_node` in your CI/CD workflows!'
 author: 'Dustin Brickwood'
 inputs:
   mode:
