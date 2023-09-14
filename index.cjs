@@ -15,7 +15,7 @@ async function run() {
     const forkAtHeight = getInput('forkAtHeight');
     const showCalls = getInput('showCalls');
     const resolveHashes = getInput('resolveHashes');
-    const saveLogs = getInput('saveLogs') === 'true';
+    const saveLogs = getInput('saveLogs');
     
     let toolPath = tc.find(ERA_TEST_NODE_NAME, ERA_TEST_NODE_VERSION);
     
@@ -31,7 +31,6 @@ async function run() {
     await exec('chmod', ['+x', `${toolPath}/era_test_node`]);
 
     let args = [mode];
-    let logStream, errorLogStream;
     if (mode === 'fork') {
       args.push(network);
       if (forkAtHeight) {
@@ -44,15 +43,17 @@ async function run() {
     if (resolveHashes === 'true') {
       args.push('--resolve-hashes');
     }
-    if (saveLogs) {
-      logStream = fs.createWriteStream('stdout.log');
-      errorLogStream = fs.createWriteStream('stderr.log');
-    }
 
     const child = spawn(`${toolPath}/era_test_node`, args, {
       detached: true,
-      stdio: ['ignore', logStream, errorLogStream] 
+      stdio: ['ignore', 'pipe', 'pipe'] 
     });
+    if (saveLogs === 'true') {
+      const stdoutLogStream = fs.createWriteStream('stdout.log');
+      const stderrLogStream = fs.createWriteStream('stderr.log');
+      child.stdout.pipe(stdoutLogStream);
+      child.stderr.pipe(stderrLogStream);
+    }
     
     child.on('error', (error) => {
       console.error(`Failed to start child process: ${error}`);
