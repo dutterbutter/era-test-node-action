@@ -6,7 +6,9 @@ Certainly! Below is the updated README to reflect the new features and options.
 
 ## Description
 
-This GitHub Action runs the `era_test_node` with various options. It allows for high configurability and makes it easy to integrate `era_test_node` into your CI/CD workflows on GitHub Actions.
+This GitHub Action runs the [`era_test_node`](https://github.com/matter-labs/era-test-node) with various options. It allows for high configurability and makes it easy to integrate `era_test_node` into your CI/CD workflows on GitHub Actions.
+
+**Test node repo**: [matter-labs/era-test-node](https://github.com/matter-labs/era-test-node).
 
 ## Features 🌟
 
