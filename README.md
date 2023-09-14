@@ -1,7 +1,3 @@
-Certainly! Below is the updated README to reflect the new features and options.
-
----
-
 # Era Test Node Action 🚀
 
 ## Description
