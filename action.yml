@@ -1,6 +1,9 @@
 name: 'Era Test Node Action'
 description: 'GitHub Action that simplifies running `era_test_node` in your CI/CD workflows!'
 author: 'Dustin Brickwood'
+branding:
+  icon: 'check-circle'
+  color: 'green'
 inputs:
   mode:
     description: 'Mode to run era_test_node in (run, fork)'
