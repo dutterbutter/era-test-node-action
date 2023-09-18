@@ -166,7 +166,7 @@ jobs:
         log: 'info'
         logFilePath: 'era_test_node.log'
         target: 'x86_64-unknown-linux-gnu'
-        version: 'v0.1.0-alpha.3'
+        version: 'latest'
 ```
 
 ### Upload log file to artifacts
@@ -204,7 +204,7 @@ jobs:
         log: 'info'
         logFilePath: 'era_test_node.log'
         target: 'x86_64-unknown-linux-gnu'
-        version: 'v0.1.0-alpha.3'
+        version: 'latest'
 
     - name: Install Dependencies
       run: yarn install
@@ -251,7 +251,7 @@ jobs:
         log: 'info'
         logFilePath: 'era_test_node.log'
         target: 'x86_64-unknown-linux-gnu'
-        version: 'v0.1.0-alpha.3'
+        version: 'latest'
 ```
 
 ## Contributing 🤝

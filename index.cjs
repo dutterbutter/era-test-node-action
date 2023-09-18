@@ -2,10 +2,24 @@ const { getInput, setFailed, addPath } = require('@actions/core');
 const { exec } = require('@actions/exec');
 const tc = require('@actions/tool-cache');
 const { spawn } = require('child_process');
+const { fetch } = require('ofetch');
 
-let ERA_TEST_NODE_VERSION = getInput('version') || 'v0.1.0-alpha.3';
-let ERA_TEST_NODE_ARCH = getInput('target') || 'x86_64-unknown-linux-gnu';
-const ERA_TEST_NODE_NAME = 'era_test_node';
+const ERA_TEST_NODE_RELEASE_TAG = getInput('releaseTag') || 'latest';
+const ERA_TEST_NODE_ARCH = getInput('target') || 'x86_64-unknown-linux-gnu';
+
+async function getDownloadUrl() {
+  const releaseInfo = await fetch(`https://api.github.com/repos/matter-labs/era-test-node/releases/${ERA_TEST_NODE_RELEASE_TAG}`);
+  if (!releaseInfo || !releaseInfo.assets || !releaseInfo.assets.length) {
+    throw new Error(`Release tag ${ERA_TEST_NODE_RELEASE_TAG} not found.`);
+  }
+
+  const assetInfo = releaseInfo.assets.find(asset => asset.name.includes(ERA_TEST_NODE_ARCH));
+  if (!assetInfo) {
+    throw new Error(`Asset with architecture ${ERA_TEST_NODE_ARCH} not found.`);
+  }
+
+  return assetInfo.browser_download_url;
+}
 
 async function run() {
   try {
@@ -20,14 +34,14 @@ async function run() {
     const resolveHashes = getInput('resolveHashes');
     const log = getInput('log');
     const logFilePath = getInput('logFilePath');
-    
-    let toolPath = tc.find(ERA_TEST_NODE_NAME, ERA_TEST_NODE_VERSION);
-    
+
+    let toolPath = tc.find('era_test_node', ERA_TEST_NODE_RELEASE_TAG);
+
     if (!toolPath) {
-      const downloadUrl = `https://github.com/matter-labs/era-test-node/releases/download/${ERA_TEST_NODE_VERSION}/${ERA_TEST_NODE_NAME}-${ERA_TEST_NODE_VERSION}-${ERA_TEST_NODE_ARCH}.tar.gz`;
+      const downloadUrl = await getDownloadUrl();
       const tarFile = await tc.downloadTool(downloadUrl);
       const extractedDir = await tc.extractTar(tarFile);
-      toolPath = await tc.cacheDir(extractedDir, ERA_TEST_NODE_NAME, ERA_TEST_NODE_VERSION);
+      toolPath = await tc.cacheDir(extractedDir, 'era_test_node', ERA_TEST_NODE_RELEASE_TAG);
     }
 
     addPath(toolPath);
@@ -71,14 +85,14 @@ async function run() {
     } else {
       args.push('run');
     }
-    
+
     console.log('About to start era_test_node with args:', args);
 
     const child = spawn(`${toolPath}/era_test_node`, args, {
       detached: true,
       stdio: 'ignore'
     });
-    
+
     child.on('error', (error) => {
       console.error(`Failed to start child process: ${error}`);
     });
