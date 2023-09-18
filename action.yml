@@ -51,10 +51,10 @@ inputs:
     description: 'Target architecture'
     required: false
     default: 'x86_64-unknown-linux-gnu'
-  version:
-    description: 'Version of era_test_node'
+  releaseTag:
+    description: 'Release tag of era_test_node'
     required: false
-    default: 'v0.1.0-alpha.3'
+    default: 'latest'
 runs:
   using: 'node20'
   main: 'dist/index.cjs'
