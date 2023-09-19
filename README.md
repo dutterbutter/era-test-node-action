@@ -112,7 +112,7 @@ Target architecture.
 Version of `era_test_node` to use.
 
 - **Required**: No
-- **Default**: `v0.1.0-alpha.3`
+- **Default**: `latest`
 
 ## Example Usage 📝
 
