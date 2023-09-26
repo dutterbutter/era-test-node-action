@@ -3,14 +3,21 @@ const { exec } = require('@actions/exec');
 const tc = require('@actions/tool-cache');
 const { spawn } = require('child_process');
 const { fetch } = require('ofetch');
+const axios = require('axios');
 
 const ERA_TEST_NODE_RELEASE_TAG = getInput('releaseTag') || 'latest';
 const ERA_TEST_NODE_ARCH = getInput('target') || 'x86_64-unknown-linux-gnu';
 
 async function getDownloadUrl() {
-  const releaseInfo = await fetch(`https://api.github.com/repos/matter-labs/era-test-node/releases/${ERA_TEST_NODE_RELEASE_TAG}`);
+  const response = await fetch(`https://api.github.com/repos/matter-labs/era-test-node/releases/${ERA_TEST_NODE_RELEASE_TAG}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch release info for tag ${ERA_TEST_NODE_RELEASE_TAG}. HTTP Status: ${response.status}`);
+  }
+
+  const releaseInfo = await response.json();
+
   if (!releaseInfo || !releaseInfo.assets || !releaseInfo.assets.length) {
-    throw new Error(`Release tag ${ERA_TEST_NODE_RELEASE_TAG} not found.`);
+    throw new Error(`Release assets for tag ${ERA_TEST_NODE_RELEASE_TAG} are not available.`);
   }
 
   const assetInfo = releaseInfo.assets.find(asset => asset.name.includes(ERA_TEST_NODE_ARCH));
@@ -43,7 +50,6 @@ async function run() {
       const extractedDir = await tc.extractTar(tarFile);
       toolPath = await tc.cacheDir(extractedDir, 'era_test_node', ERA_TEST_NODE_RELEASE_TAG);
     }
-
     addPath(toolPath);
 
     await exec('chmod', ['+x', `${toolPath}/era_test_node`]);
@@ -86,7 +92,7 @@ async function run() {
       args.push('run');
     }
 
-    console.log('About to start era_test_node with args:', args);
+    console.log('Starting era_test_node with args:', args);
 
     const child = spawn(`${toolPath}/era_test_node`, args, {
       detached: true,
@@ -108,8 +114,16 @@ async function run() {
     });
 
     child.unref();
-
-    console.log('era_test_node is now be running in the background');
+    // sanity check
+    // Adding a timeout to give the node some time to start up before checking
+    setTimeout(async () => {
+      if(port && await isNodeRunning(port)) {
+        console.log(`Confirmed: era_test_node is running on port ${port}`);
+      } else {
+        console.error('Health check failed: era_test_node appears to be not running.');
+        setFailed('Failed to start era_test_node');
+      }
+    }, 5000);
 
   } catch (error) {
     setFailed(error.message);
@@ -117,3 +131,17 @@ async function run() {
 }
 
 run();
+
+async function isNodeRunning(port) {
+  try {
+    const response = await axios.post(`http://localhost:${port}`, {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "eth_blockNumber",
+      params: []
+    });
+    return (response.data && response.data.result !== undefined);
+  } catch (error) {
+    return false;
+  }
+}
