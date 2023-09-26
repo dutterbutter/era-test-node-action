@@ -8,11 +8,19 @@ const ERA_TEST_NODE_RELEASE_TAG = getInput('releaseTag') || 'latest';
 const ERA_TEST_NODE_ARCH = getInput('target') || 'x86_64-unknown-linux-gnu';
 
 async function getDownloadUrl() {
-  const releaseInfo = await fetch(`https://api.github.com/repos/matter-labs/era-test-node/releases/${ERA_TEST_NODE_RELEASE_TAG}`);
-  console.log('releaseInfo:', releaseInfo);
+  const response = await fetch(`https://api.github.com/repos/matter-labs/era-test-node/releases/${ERA_TEST_NODE_RELEASE_TAG}`);
+  console.log('response:', response);
   console.log("url:: ", `https://api.github.com/repos/matter-labs/era-test-node/releases/${ERA_TEST_NODE_RELEASE_TAG}`);
+
+  // Check for a valid response status.
+  if (!response.ok) {
+    throw new Error(`Failed to fetch release info. Status: ${response.status}`);
+  }
+
+  const releaseInfo = await response.json();
+
   if (!releaseInfo || !releaseInfo.assets || !releaseInfo.assets.length) {
-    throw new Error(`Release tag ${ERA_TEST_NODE_RELEASE_TAG} not found. ${releaseInfo}`);
+    throw new Error(`Release tag ${ERA_TEST_NODE_RELEASE_TAG} not found. ${JSON.stringify(releaseInfo)}`);
   }
 
   const assetInfo = releaseInfo.assets.find(asset => asset.name.includes(ERA_TEST_NODE_ARCH));
