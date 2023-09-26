@@ -3,6 +3,7 @@ const { exec } = require('@actions/exec');
 const tc = require('@actions/tool-cache');
 const { spawn } = require('child_process');
 const { fetch } = require('ofetch');
+const axios = require('axios');
 
 const ERA_TEST_NODE_RELEASE_TAG = getInput('releaseTag') || 'latest';
 const ERA_TEST_NODE_ARCH = getInput('target') || 'x86_64-unknown-linux-gnu';
@@ -49,8 +50,6 @@ async function run() {
       const extractedDir = await tc.extractTar(tarFile);
       toolPath = await tc.cacheDir(extractedDir, 'era_test_node', ERA_TEST_NODE_RELEASE_TAG);
     }
-    console.log("era_test_node path:", toolPath);
-    console.log("era_test_node version:", ERA_TEST_NODE_RELEASE_TAG);
     addPath(toolPath);
 
     await exec('chmod', ['+x', `${toolPath}/era_test_node`]);
@@ -93,7 +92,7 @@ async function run() {
       args.push('run');
     }
 
-    console.log('About to start era_test_node with args:', args);
+    console.log('Starting era_test_node with args:', args);
 
     const child = spawn(`${toolPath}/era_test_node`, args, {
       detached: true,
@@ -116,6 +115,16 @@ async function run() {
 
     child.unref();
 
+    // Adding a timeout to give the node some time to start up before checking
+    setTimeout(async () => {
+      if(port && await isNodeRunning(port)) {
+        console.log(`era_test_node seems to be running on port ${port}`);
+      } else {
+        console.error('era_test_node does not seem to be running.');
+        setFailed('Failed to start era_test_node');
+      }
+    }, 5000);
+
     console.log('era_test_node is now be running in the background');
 
   } catch (error) {
@@ -124,3 +133,18 @@ async function run() {
 }
 
 run();
+
+async function isNodeRunning(port) {
+  try {
+    const response = await axios.post(`http://localhost:${port}`, {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "eth_blockNumber",
+      params: []
+    });
+    return (response.data && response.data.result !== undefined);
+  } catch (error) {
+    return false;
+  }
+}
+
