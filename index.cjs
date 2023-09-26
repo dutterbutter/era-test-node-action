@@ -9,10 +9,6 @@ const ERA_TEST_NODE_ARCH = getInput('target') || 'x86_64-unknown-linux-gnu';
 
 async function getDownloadUrl() {
   const response = await fetch(`https://api.github.com/repos/matter-labs/era-test-node/releases/${ERA_TEST_NODE_RELEASE_TAG}`);
-  console.log('response:', response);
-  console.log("url:: ", `https://api.github.com/repos/matter-labs/era-test-node/releases/${ERA_TEST_NODE_RELEASE_TAG}`);
-
-  // Check for a valid response status.
   if (!response.ok) {
     throw new Error(`Failed to fetch release info. Status: ${response.status}`);
   }
