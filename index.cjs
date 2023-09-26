@@ -43,7 +43,8 @@ async function run() {
       const extractedDir = await tc.extractTar(tarFile);
       toolPath = await tc.cacheDir(extractedDir, 'era_test_node', ERA_TEST_NODE_RELEASE_TAG);
     }
-
+    console.log("era_test_node path:", toolPath);
+    console.log("era_test_node version:", ERA_TEST_NODE_RELEASE_TAG);
     addPath(toolPath);
 
     await exec('chmod', ['+x', `${toolPath}/era_test_node`]);

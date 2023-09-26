@@ -1,0 +1,5 @@
+/*! fetch-blob. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
+
+/*! formdata-polyfill. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
+
+/*! node-domexception. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
