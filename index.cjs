@@ -20,7 +20,7 @@ async function getDownloadUrl() {
   const releaseInfo = await response.json();
 
   if (!releaseInfo || !releaseInfo.assets || !releaseInfo.assets.length) {
-    throw new Error(`Release tag ${ERA_TEST_NODE_RELEASE_TAG} not found. ${JSON.stringify(releaseInfo)}`);
+    throw new Error(`Release tag ${ERA_TEST_NODE_RELEASE_TAG} not found.`);
   }
 
   const assetInfo = releaseInfo.assets.find(asset => asset.name.includes(ERA_TEST_NODE_ARCH));
