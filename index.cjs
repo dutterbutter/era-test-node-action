@@ -12,7 +12,7 @@ async function getDownloadUrl() {
   console.log('releaseInfo:', releaseInfo);
   console.log("url:: ", `https://api.github.com/repos/matter-labs/era-test-node/releases/${ERA_TEST_NODE_RELEASE_TAG}`);
   if (!releaseInfo || !releaseInfo.assets || !releaseInfo.assets.length) {
-    throw new Error(`Release tag ${ERA_TEST_NODE_RELEASE_TAG} not found.`);
+    throw new Error(`Release tag ${ERA_TEST_NODE_RELEASE_TAG} not found. ${releaseInfo}`);
   }
 
   const assetInfo = releaseInfo.assets.find(asset => asset.name.includes(ERA_TEST_NODE_ARCH));
