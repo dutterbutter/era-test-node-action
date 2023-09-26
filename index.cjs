@@ -9,6 +9,8 @@ const ERA_TEST_NODE_ARCH = getInput('target') || 'x86_64-unknown-linux-gnu';
 
 async function getDownloadUrl() {
   const releaseInfo = await fetch(`https://api.github.com/repos/matter-labs/era-test-node/releases/${ERA_TEST_NODE_RELEASE_TAG}`);
+  console.log('releaseInfo:', releaseInfo);
+  console.log("url:: ", `https://api.github.com/repos/matter-labs/era-test-node/releases/${ERA_TEST_NODE_RELEASE_TAG}`);
   if (!releaseInfo || !releaseInfo.assets || !releaseInfo.assets.length) {
     throw new Error(`Release tag ${ERA_TEST_NODE_RELEASE_TAG} not found.`);
   }
