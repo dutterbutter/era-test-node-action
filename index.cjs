@@ -9,7 +9,14 @@ const ERA_TEST_NODE_RELEASE_TAG = getInput('releaseTag') || 'latest';
 const ERA_TEST_NODE_ARCH = getInput('target') || 'x86_64-unknown-linux-gnu';
 
 async function getDownloadUrl() {
-  const response = await fetch(`https://api.github.com/repos/matter-labs/era-test-node/releases/tags/${ERA_TEST_NODE_RELEASE_TAG}`);
+  let apiUrl;
+  if (ERA_TEST_NODE_RELEASE_TAG === 'latest') {
+    apiUrl = 'https://api.github.com/repos/matter-labs/era-test-node/releases/latest';
+  } else {
+    apiUrl = `https://api.github.com/repos/matter-labs/era-test-node/releases/tags/${ERA_TEST_NODE_RELEASE_TAG}`;
+  }
+
+  const response = await fetch(apiUrl);
   if (!response.ok) {
     throw new Error(`Failed to fetch release info for tag ${ERA_TEST_NODE_RELEASE_TAG}. HTTP Status: ${response.status}`);
   }
