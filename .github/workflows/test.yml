@@ -1,0 +1,31 @@
+name: Test Action from dist
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test-dist-action:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+
+      - name: Install dependencies and build
+        run: |
+          yarn install
+          yarn build
+            
+      - name: Run action from dist
+        uses: ./
+        with:
+          releaseTag: 'latest'
+          target: 'x86_64-unknown-linux-gnu'

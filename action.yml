@@ -13,8 +13,8 @@ inputs:
     description: 'Network to use (e.g., mainnet, testnet)'
     required: false
   forkAtHeight:
-      description: 'Block height to fork at'
-      required: false
+    description: 'Block height to fork at'
+    required: false
   port:
     description: 'Port to listen on'
     required: false

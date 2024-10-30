@@ -1,0 +1,36 @@
+name: Lint and Format Check
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  lint-and-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run ESLint for linting
+        run: yarn lint
+
+      - name: Run Prettier for formatting check
+        run: yarn format --check
+
+      - name: Validate action.yml with Super-Linter
+        uses: super-linter/super-linter@v7.1.0 
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            VALIDATE_YAML: true
+            VALIDATE_GITHUB_ACTIONS: true
+            VALIDATE_ALL_CODEBASE: false  
+            FILTER_REGEX_INCLUDE: "^action.yml$"  # Only 

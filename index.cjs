@@ -3,7 +3,6 @@ const { exec } = require('@actions/exec');
 const tc = require('@actions/tool-cache');
 const { spawn } = require('child_process');
 const { fetch } = require('ofetch');
-const axios = require('axios');
 
 const ERA_TEST_NODE_RELEASE_TAG = getInput('releaseTag') || 'latest';
 const ERA_TEST_NODE_ARCH = getInput('target') || 'x86_64-unknown-linux-gnu';
@@ -11,23 +10,30 @@ const ERA_TEST_NODE_ARCH = getInput('target') || 'x86_64-unknown-linux-gnu';
 async function getDownloadUrl() {
   let apiUrl;
   if (ERA_TEST_NODE_RELEASE_TAG === 'latest') {
-    apiUrl = 'https://api.github.com/repos/matter-labs/era-test-node/releases/latest';
+    apiUrl =
+      'https://api.github.com/repos/matter-labs/era-test-node/releases/latest';
   } else {
     apiUrl = `https://api.github.com/repos/matter-labs/era-test-node/releases/tags/${ERA_TEST_NODE_RELEASE_TAG}`;
   }
 
   const response = await fetch(apiUrl);
   if (!response.ok) {
-    throw new Error(`Failed to fetch release info for tag ${ERA_TEST_NODE_RELEASE_TAG}. HTTP Status: ${response.status}`);
+    throw new Error(
+      `Failed to fetch release info for tag ${ERA_TEST_NODE_RELEASE_TAG}. HTTP Status: ${response.status}`
+    );
   }
 
   const releaseInfo = await response.json();
 
   if (!releaseInfo || !releaseInfo.assets || !releaseInfo.assets.length) {
-    throw new Error(`Release assets for tag ${ERA_TEST_NODE_RELEASE_TAG} are not available.`);
+    throw new Error(
+      `Release assets for tag ${ERA_TEST_NODE_RELEASE_TAG} are not available.`
+    );
   }
 
-  const assetInfo = releaseInfo.assets.find(asset => asset.name.includes(ERA_TEST_NODE_ARCH));
+  const assetInfo = releaseInfo.assets.find((asset) =>
+    asset.name.includes(ERA_TEST_NODE_ARCH)
+  );
   if (!assetInfo) {
     throw new Error(`Asset with architecture ${ERA_TEST_NODE_ARCH} not found.`);
   }
@@ -55,7 +61,11 @@ async function run() {
       const downloadUrl = await getDownloadUrl();
       const tarFile = await tc.downloadTool(downloadUrl);
       const extractedDir = await tc.extractTar(tarFile);
-      toolPath = await tc.cacheDir(extractedDir, 'era_test_node', ERA_TEST_NODE_RELEASE_TAG);
+      toolPath = await tc.cacheDir(
+        extractedDir,
+        'era_test_node',
+        ERA_TEST_NODE_RELEASE_TAG
+      );
     }
     addPath(toolPath);
 
@@ -103,7 +113,7 @@ async function run() {
 
     const child = spawn(`${toolPath}/era_test_node`, args, {
       detached: true,
-      stdio: 'ignore'
+      stdio: 'ignore',
     });
 
     child.on('error', (error) => {
@@ -124,14 +134,15 @@ async function run() {
     // sanity check
     // Adding a timeout to give the node some time to start up before checking
     setTimeout(async () => {
-      if(port && await isNodeRunning(port)) {
+      if (port && (await isNodeRunning(port))) {
         console.log(`Confirmed: era_test_node is running on port ${port}`);
       } else {
-        console.error('Health check failed: era_test_node appears to be not running.');
+        console.error(
+          'Health check failed: era_test_node appears to be not running.'
+        );
         setFailed('Failed to start era_test_node');
       }
     }, 5000);
-
   } catch (error) {
     setFailed(error.message);
   }
@@ -141,14 +152,15 @@ run();
 
 async function isNodeRunning(port) {
   try {
-    const response = await axios.post(`http://localhost:${port}`, {
-      jsonrpc: "2.0",
+    const response = await fetch(`http://localhost:${port}`, {
+      jsonrpc: '2.0',
       id: 1,
-      method: "eth_blockNumber",
-      params: []
+      method: 'eth_blockNumber',
+      params: [],
     });
-    return (response.data && response.data.result !== undefined);
+    return response.data && response.data.result !== undefined;
   } catch (error) {
+    console.error('Health check failed:', error.message);
     return false;
   }
 }

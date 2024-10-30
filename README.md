@@ -47,7 +47,7 @@ Port to listen on.
 
 ### `showCalls`
 
-Show call debug information. 
+Show call debug information.
 
 - **Required**: No
 - **Default**: `none`
@@ -90,7 +90,7 @@ Log filter level.
 
 - **Required**: No
 - **Default**: `info`
-- **Options**:  `debug`, `info`, `warn`, `error`
+- **Options**: `debug`, `info`, `warn`, `error`
 
 ### `logFilePath`
 
@@ -123,18 +123,18 @@ name: Run Era Test Node Action
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Run Era Test Node
-      uses: dutterbutter/era-test-node-action@latest
+      - name: Run Era Test Node
+        uses: dutterbutter/era-test-node-action@latest
 ```
 
 ### Command options
@@ -144,29 +144,29 @@ name: Run Era Test Node Action
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Run Era Test Node
-      uses: dutterbutter/era-test-node-action@latest
-      with:
-        mode: 'run'
-        showCalls: 'user'
-        showStorageLogs: 'read'
-        showVmDetails: 'all'
-        showGasDetails: 'all'
-        resolveHashes: 'true'
-        log: 'info'
-        logFilePath: 'era_test_node.log'
-        target: 'x86_64-unknown-linux-gnu'
-        releaseTag: 'latest'
+      - name: Run Era Test Node
+        uses: dutterbutter/era-test-node-action@latest
+        with:
+          mode: 'run'
+          showCalls: 'user'
+          showStorageLogs: 'read'
+          showVmDetails: 'all'
+          showGasDetails: 'all'
+          resolveHashes: 'true'
+          log: 'info'
+          logFilePath: 'era_test_node.log'
+          target: 'x86_64-unknown-linux-gnu'
+          releaseTag: 'latest'
 ```
 
 ### Upload log file to artifacts
@@ -187,37 +187,37 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
-    
-    - name: Run Era Test Node
-      uses: dutterbutter/era-test-node-action@latest
-      with:
-        mode: 'fork'
-        network: 'mainnet'
-        forkAtHeight: '1855248'
-        showCalls: 'user'
-        showStorageLogs: 'read'
-        showVmDetails: 'all'
-        showGasDetails: 'all'
-        resolveHashes: 'true'
-        log: 'info'
-        logFilePath: 'era_test_node.log'
-        target: 'x86_64-unknown-linux-gnu'
-        releaseTag: 'latest'
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Install Dependencies
-      run: yarn install
-    
-    - name: Run Tests
-      run: |
-        yarn test:contracts
+      - name: Run Era Test Node
+        uses: dutterbutter/era-test-node-action@latest
+        with:
+          mode: 'fork'
+          network: 'mainnet'
+          forkAtHeight: '1855248'
+          showCalls: 'user'
+          showStorageLogs: 'read'
+          showVmDetails: 'all'
+          showGasDetails: 'all'
+          resolveHashes: 'true'
+          log: 'info'
+          logFilePath: 'era_test_node.log'
+          target: 'x86_64-unknown-linux-gnu'
+          releaseTag: 'latest'
 
-    - name: Upload era_test_node log
-      uses: actions/upload-artifact@v3
-      with:
-        name: era_test_node-log
-        path: era_test_node.log
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Run Tests
+        run: |
+          yarn test:contracts
+
+      - name: Upload era_test_node log
+        uses: actions/upload-artifact@v3
+        with:
+          name: era_test_node-log
+          path: era_test_node.log
 ```
 
 ### With Fork
@@ -227,31 +227,31 @@ name: Run Era Test Node Action
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Run Era Test Node
-      uses: dutterbutter/era-test-node-action@latest
-      with:
-        mode: 'fork'
-        network: 'mainnet'
-        forkAtHeight: '1855248'
-        showCalls: 'user'
-        showStorageLogs: 'read'
-        showVmDetails: 'all'
-        showGasDetails: 'all'
-        resolveHashes: 'true'
-        log: 'info'
-        logFilePath: 'era_test_node.log'
-        target: 'x86_64-unknown-linux-gnu'
-        releaseTag: 'latest'
+      - name: Run Era Test Node
+        uses: dutterbutter/era-test-node-action@latest
+        with:
+          mode: 'fork'
+          network: 'mainnet'
+          forkAtHeight: '1855248'
+          showCalls: 'user'
+          showStorageLogs: 'read'
+          showVmDetails: 'all'
+          showGasDetails: 'all'
+          resolveHashes: 'true'
+          log: 'info'
+          logFilePath: 'era_test_node.log'
+          target: 'x86_64-unknown-linux-gnu'
+          releaseTag: 'latest'
 ```
 
 ## Contributing 🤝
