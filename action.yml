@@ -35,6 +35,10 @@ inputs:
     description: 'Show Gas details information'
     required: false
     default: 'none'
+  debugMode:
+    description: 'Show debug information'
+    required: false
+    default: 'none'
   resolveHashes:
     description: 'Enable hash resolution'
     required: false
@@ -47,6 +51,14 @@ inputs:
     description: 'Log file path'
     required: false
     default: 'era_test_node.log'
+  devSystemContracts:
+    description: 'Specify the system contract mode (built-in, built-in-no-verify, local)'
+    required: false
+    default: 'built-in'
+  emulateEvm:
+    description: 'Enable EVM emulation (requires devSystemContracts to be set to "local")'
+    required: false
+    default: 'false'
   target:
     description: 'Target architecture'
     required: false

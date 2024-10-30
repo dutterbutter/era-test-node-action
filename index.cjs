@@ -3,7 +3,6 @@ const { exec } = require('@actions/exec');
 const tc = require('@actions/tool-cache');
 const { spawn } = require('child_process');
 const { fetch } = require('ofetch');
-const axios = require('axios');
 
 const ERA_TEST_NODE_RELEASE_TAG = getInput('releaseTag') || 'latest';
 const ERA_TEST_NODE_ARCH = getInput('target') || 'x86_64-unknown-linux-gnu';
@@ -45,9 +44,17 @@ async function run() {
     const showStorageLogs = getInput('showStorageLogs');
     const showVmDetails = getInput('showVmDetails');
     const showGasDetails = getInput('showGasDetails');
+    const debugMode = getInput('debugMode');
     const resolveHashes = getInput('resolveHashes');
     const log = getInput('log');
     const logFilePath = getInput('logFilePath');
+    const devSystemContracts = getInput('devSystemContracts');
+    const emulateEvm = getInput('emulateEvm') === 'true';
+
+    if (emulateEvm && devSystemContracts !== 'local') {
+      setFailed("The '--emulate-evm' option requires '--dev-system-contracts=local'. Please set devSystemContracts to 'local' or disable emulateEvm.");
+      return;
+    }
 
     let toolPath = tc.find('era_test_node', ERA_TEST_NODE_RELEASE_TAG);
 
@@ -78,6 +85,9 @@ async function run() {
     if (showGasDetails) {
       args.push('--show-gas-details', showGasDetails);
     }
+    if (debugMode) {
+      args.push('--debug-mode', debugMode);
+    }
     if (resolveHashes === 'true') {
       args.push('--resolve-hashes');
     }
@@ -86,6 +96,12 @@ async function run() {
     }
     if (logFilePath) {
       args.push('--log-file-path', logFilePath);
+    }
+    if (devSystemContracts) {
+      args.push('--dev-system-contracts', devSystemContracts);
+    }
+    if (devSystemContracts === 'local' && emulateEvm) {
+      args.push('--emulate-evm');
     }
     if (mode === 'fork') {
       args.push('fork');
@@ -141,7 +157,7 @@ run();
 
 async function isNodeRunning(port) {
   try {
-    const response = await axios.post(`http://localhost:${port}`, {
+    const response = await fetch(`http://localhost:${port}`, {
       jsonrpc: "2.0",
       id: 1,
       method: "eth_blockNumber",
