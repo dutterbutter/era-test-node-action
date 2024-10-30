@@ -50,6 +50,7 @@ async function run() {
     const logFilePath = getInput('logFilePath');
     const devSystemContracts = getInput('devSystemContracts');
     const emulateEvm = getInput('emulateEvm') === 'true';
+    const chainId = getInput('chainId');
 
     if (emulateEvm && devSystemContracts !== 'local') {
       setFailed("The '--emulate-evm' option requires '--dev-system-contracts=local'. Please set devSystemContracts to 'local' or disable emulateEvm.");
@@ -102,6 +103,9 @@ async function run() {
     }
     if (devSystemContracts === 'local' && emulateEvm) {
       args.push('--emulate-evm');
+    }
+    if (chainId) {
+      args.push('--chain-id', chainId);
     }
     if (mode === 'fork') {
       args.push('fork');

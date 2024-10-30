@@ -59,6 +59,10 @@ inputs:
     description: 'Enable EVM emulation (requires devSystemContracts to be set to "local")'
     required: false
     default: 'false'
+  chainId:
+    description: 'Chain ID'
+    required: false
+    default: 'none'
   target:
     description: 'Target architecture'
     required: false
