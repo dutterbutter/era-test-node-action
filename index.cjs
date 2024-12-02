@@ -3,6 +3,7 @@ const { exec } = require("@actions/exec");
 const tc = require("@actions/tool-cache");
 const { spawn } = require("child_process");
 const { fetch } = require("ofetch");
+const axios = require("axios");
 
 const ERA_TEST_NODE_RELEASE_TAG = getInput("releaseTag") || "latest";
 const ERA_TEST_NODE_ARCH = getInput("target") || "x86_64-unknown-linux-gnu";
@@ -11,9 +12,9 @@ async function getDownloadUrl() {
   let apiUrl;
   if (ERA_TEST_NODE_RELEASE_TAG === "latest") {
     apiUrl =
-      "https://api.github.com/repos/matter-labs/anvil-zksync/releases/tags/v0.1.0-alpha.34";
+      "https://api.github.com/repos/matter-labs/era-test-node/releases/tags/v0.1.0-alpha.34";
   } else {
-    apiUrl = `https://api.github.com/repos/matter-labs/anvil-zksync/releases/tags/${ERA_TEST_NODE_RELEASE_TAG}`;
+    apiUrl = `https://api.github.com/repos/matter-labs/era-test-node/releases/tags/${ERA_TEST_NODE_RELEASE_TAG}`;
   }
 
   const response = await fetch(apiUrl);
@@ -152,7 +153,7 @@ run();
 
 async function isNodeRunning(port) {
   try {
-    const response = await fetch.post(`http://localhost:${port}`, {
+    const response = await axios.post(`http://localhost:${port}`, {
       jsonrpc: "2.0",
       id: 1,
       method: "eth_blockNumber",
