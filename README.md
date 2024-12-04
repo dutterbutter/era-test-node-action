@@ -1,5 +1,10 @@
 # Era Test Node Action 🚀
 
+### ⚠️ Warning
+
+This action has been **archived** in favor of [`anvil-zksync-action`](https://github.com/dutterbutter/anvil-zksync-action).  
+By default, this action fetches version `v0.1.0-alpha.34` of `era-test-node` unless a different tag is specified, as this was the last release before the binary was renamed. Tags past this may not work given the binary difference.
+
 ## Description
 
 This GitHub Action runs the [`era_test_node`](https://github.com/matter-labs/era-test-node) with various options. It allows for high configurability and makes it easy to integrate `era_test_node` into your CI/CD workflows on GitHub Actions.
