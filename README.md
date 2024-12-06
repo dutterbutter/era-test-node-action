@@ -3,7 +3,7 @@
 ### ⚠️ Warning
 
 This action has been **archived** in favor of [`anvil-zksync-action`](https://github.com/dutterbutter/anvil-zksync-action).  
-By default, this action fetches version `v0.1.0-alpha.34` of `era-test-node` unless a different tag is specified, as this was the last release before the binary was renamed. Tags past this may not work given the binary difference.
+By default, this action fetches version `v0.1.0-alpha.36` of `era-test-node` unless a different tag is specified, as this was the last release before the binary was renamed. Tags past this may not work given the binary difference.
 
 ## Description
 

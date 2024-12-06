@@ -12,7 +12,7 @@ async function getDownloadUrl() {
   let apiUrl;
   if (ERA_TEST_NODE_RELEASE_TAG === "latest") {
     apiUrl =
-      "https://api.github.com/repos/matter-labs/era-test-node/releases/tags/v0.1.0-alpha.34";
+      "https://api.github.com/repos/matter-labs/era-test-node/releases/tags/v0.1.0-alpha.36";
   } else {
     apiUrl = `https://api.github.com/repos/matter-labs/era-test-node/releases/tags/${ERA_TEST_NODE_RELEASE_TAG}`;
   }
@@ -20,7 +20,7 @@ async function getDownloadUrl() {
   const response = await fetch(apiUrl);
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch release info for tag ${ERA_TEST_NODE_RELEASE_TAG}. HTTP Status: ${response.status}`
+      `Failed to fetch release info for tag ${ERA_TEST_NODE_RELEASE_TAG}. era-test-node-action will only support latest (v0.1.0-alpha.36) in favour of anvil-zksync-action. HTTP Status: ${response.status}`
     );
   }
 
